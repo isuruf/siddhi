@@ -88,7 +88,7 @@ public class RTransformTestCase {
 		// Assert.assertEquals("In and Remove events has to be equal", 0,
 		// count);
 		log.info("count "+count);
-		Assert.assertEquals("Event arrived", true, eventArrived);
+		Assert.assertEquals("Event arrived", 1, count);
 		siddhiManager.shutdown();
 	}
 }
