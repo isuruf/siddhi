@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<executionPlan name="WeatherMsg" statistics="disable" trace="disable" xmlns="http://wso2.org/carbon/eventprocessor">
+  <description/>
+  <siddhiConfiguration>
+    <property name="siddhi.persistence.snapshot.time.interval.minutes">0</property>
+    <property name="siddhi.enable.distributed.processing">false</property>
+  </siddhiConfiguration>
+  <importedStreams>
+    <stream as="inStream" name="WeatherStatsStream" version="1.0.0"/>
+  </importedStreams>
+  <queryExpressions><![CDATA[from inStream#transform.R:runScript("fit<-lm(Temp~Time); c <- coef(fit)[['(Intercept)']]; m<-coef(fit)[['Time']];", "10" , "m,c")
+select m, c
+insert into outStream]]></queryExpressions>
+  <exportedStreams>
+    <stream name="RegressionResults" valueOf="outStream" version="1.0.0"/>
+  </exportedStreams>
+</executionPlan>

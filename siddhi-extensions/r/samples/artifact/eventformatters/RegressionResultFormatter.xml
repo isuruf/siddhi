@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eventFormatter name="RegressionResultFormatter" statistics="disable"
+  trace="disable" xmlns="http://wso2.org/carbon/eventformatter">
+  <from streamName="RegressionResults" version="1.0.0"/>
+  <mapping customMapping="enable" type="text">
+    <inline>Regression Results
+
+m : {{m}}
+c : {{c}}
+</inline>
+  </mapping>
+  <to eventAdaptorName="RegressionResultsOutputAdaptor" eventAdaptorType="jms">
+    <property name="transport.jms.Destination">RegressionResults</property>
+  </to>
+</eventFormatter>

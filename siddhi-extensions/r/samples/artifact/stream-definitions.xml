@@ -1,0 +1,43 @@
+<streamDefinitions xmlns="http://wso2.org/carbon/databridge">
+
+    <streamDefinition>
+    {
+  "name": "RegressionResults",
+  "version": "1.0.0",
+  "nickName": "",
+  "description": "",
+  "payloadData": [
+    {
+      "name": "m",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "c",
+      "type": "DOUBLE"
+    }
+  ]}  
+    </streamDefinition>
+   
+    <streamDefinition>
+    {
+  "name": "WeatherStatsStream",
+  "version": "1.0.0",
+  "nickName": "",
+  "description": "",
+  "payloadData": [
+    {
+      "name": "Time",
+      "type": "LONG"
+    },
+    {
+      "name": "Temp",
+      "type": "DOUBLE"
+    }
+  ]
+}
+   
+    </streamDefinition>                                 
+
+
+
+</streamDefinitions>
