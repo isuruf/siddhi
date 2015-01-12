@@ -27,7 +27,7 @@ public class RSourceTransformProcessor extends RTransformProcessor {
 		String outputString = ((StringConstant) expressions[2]).getValue();
 
 		StringBuilder sb = new StringBuilder();
-		scriptString = sb.append("source(\"").append(scriptString).append("\")").toString();
+		scriptString = sb.append("source(\"").append(scriptString).append("\", local=TRUE)").toString();
 		log.info(scriptString);
 		initialize(scriptString, time, outputString);
 	}

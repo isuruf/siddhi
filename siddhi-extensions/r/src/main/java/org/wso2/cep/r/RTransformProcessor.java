@@ -32,7 +32,7 @@ public abstract class RTransformProcessor extends TransformProcessor {
 	List<InEvent> eventList = new ArrayList<InEvent>();
 
 	REXP outputs;
-	String script;
+	REXP script;
 	REXP env;
 
 	static REngine re;
@@ -84,16 +84,14 @@ public abstract class RTransformProcessor extends TransformProcessor {
 				}
 				re.assign(attr.getName(), eventData, env);
 			}
-			log.info(script);
-			
-			re.parseAndEval("source(\"/home/sanka/workspace2/siddhi/siddhi-extensions/r/src/test/resources/sampleSource.R\")", env, false);
+			re.eval(script, env, false);
 			REXP x = re.eval(outputs, env, true);
 
 			double[] out = x.asDoubles();
 			Object[] data = new Object[out.length];
 			for (int i = 0; i < out.length; i++) {
 				data[i] = out[i];
-				//log.info(out[i]);
+				log.info(out[i]);
 			}
 
 			eventList.clear();
@@ -141,8 +139,8 @@ public abstract class RTransformProcessor extends TransformProcessor {
 			log.info(e.getMessage());
 		}
 
-		//log.info(scriptString);
-		//log.info(outputString);
+		log.info(scriptString);
+		log.info(outputString);
 
 		if (temp.endsWith("s")) {
 			duration = Integer.parseInt(temp.substring(0, temp.length() - 1)
@@ -178,8 +176,7 @@ public abstract class RTransformProcessor extends TransformProcessor {
 			// Parse the expression
 			outputs = re.parse(outputString, false);
 			// Parse the script
-			//script = re.parse(scriptString, false);
-			script=scriptString;
+			script = re.parse(scriptString, false);
 		} catch (REngineException e) {
 			log.info(e.getMessage());
 		}

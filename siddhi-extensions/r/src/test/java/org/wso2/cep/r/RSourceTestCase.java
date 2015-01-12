@@ -58,7 +58,7 @@ public class RSourceTestCase {
 		  Query query = QueryFactory.createQuery();
 	        query.from(
 	                QueryFactory.inputStream("weather").
-	                        transform("R", "runSource", Expression.value("/home/sanka/workspace2/siddhi/siddhi-extensions/r/src/test/resources/sampleSource.R"), Expression.value("2"), Expression.value("m,c"))
+	                        transform("R", "runSource", Expression.value("sample.R"), Expression.value("2"), Expression.value("m,c"))
 	        );
 	        query.select(
 	                QueryFactory.outputSelector().
