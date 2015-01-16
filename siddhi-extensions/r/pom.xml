@@ -1,90 +1,99 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<parent>
 		<artifactId>siddhi-extensions</artifactId>
 		<groupId>org.wso2.siddhi.gpl</groupId>
 		<version>2.2.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
-    <version>2.1.0-wso2v1</version>
-    <artifactId>r</artifactId>
+	<artifactId>r</artifactId>
 
 	<packaging>bundle</packaging>
 
-    <repositories>
-        <repository>
-            <id>wso2-maven2-repository</id>
-            <name>WSO2 Maven2 Repository</name>
-            <url>http://dist.wso2.org/maven2</url>
-        </repository>
-    </repositories>
+	<repositories>
+		<repository>
+			<id>wso2-maven2-repository</id>
+			<name>WSO2 Maven2 Repository</name>
+			<url>http://dist.wso2.org/maven2</url>
+		</repository>
+	</repositories>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.wso2.siddhi</groupId>
-            <artifactId>siddhi-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.siddhi</groupId>
-            <artifactId>siddhi-query</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.siddhi</groupId>
-            <artifactId>siddhi-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.lucarosellini.rJava</groupId>
-            <artifactId>JRI</artifactId>
-            <version>0.9-7</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.lucarosellini.rJava</groupId>
-            <artifactId>JRIEngine</artifactId>
-            <version>0.9-7</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.lucarosellini.rJava</groupId>
-            <artifactId>REngine</artifactId>
-            <version>0.9-7</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-        </dependency>
-        
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <scope>test</scope>
-            </dependency>
-    </dependencies>
+	<dependencies>
+		<dependency>
+			<groupId>org.wso2.siddhi</groupId>
+			<artifactId>siddhi-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.wso2.siddhi</groupId>
+			<artifactId>siddhi-query</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.wso2.siddhi</groupId>
+			<artifactId>siddhi-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.lucarosellini.rJava</groupId>
+			<artifactId>JRI</artifactId>
+			<version>0.9-7</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.lucarosellini.rJava</groupId>
+			<artifactId>JRIEngine</artifactId>
+			<version>0.9-7</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.lucarosellini.rJava</groupId>
+			<artifactId>REngine</artifactId>
+			<version>0.9-7</version>
+		</dependency>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <version>2.3.7</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Bundle-Name>${project.artifactId}</Bundle-Name>
-                        <Export-Package>
-                            org.wso2.siddhi.gpl.extension.geo.*
-                        </Export-Package>
-                        <Import-Package>
-                            *;resolution:=optional
-                        </Import-Package>
-                        <DynamicImport-Package>*</DynamicImport-Package>
-                    </instructions>
-                    <argLine>-Djava.libaray.path=/usr/lib/R/site-library/rJava/jri</argLine>
-                </configuration>
-            </plugin>          
-        </plugins>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
 
-    </build>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>2.3.7</version>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+						<Bundle-Name>${project.artifactId}</Bundle-Name>
+						<Export-Package>
+							org.wso2.siddhi.gpl.extension.geo.*
+						</Export-Package>
+						<Import-Package>
+							*;resolution:=optional
+						</Import-Package>
+						<DynamicImport-Package>*</DynamicImport-Package>
+					</instructions>
+				</configuration>
+
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.13</version>
+				<configuration>
+					<argLine>-Djava.library.path=${env.JRI_HOME}</argLine>
+					<includes>
+					
+					</includes>
+				</configuration>
+			</plugin>
+		</plugins>
+
+	</build>
 </project>

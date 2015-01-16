@@ -91,7 +91,7 @@ public abstract class RTransformProcessor extends TransformProcessor {
 			Object[] data = new Object[out.length];
 			for (int i = 0; i < out.length; i++) {
 				data[i] = out[i];
-				log.info(out[i]);
+				//log.info(out[i]);
 			}
 
 			eventList.clear();
@@ -139,9 +139,6 @@ public abstract class RTransformProcessor extends TransformProcessor {
 			log.info(e.getMessage());
 		}
 
-		log.info(scriptString);
-		log.info(outputString);
-
 		if (temp.endsWith("s")) {
 			duration = Integer.parseInt(temp.substring(0, temp.length() - 1)
 					.trim()) * 1000;
@@ -171,10 +168,10 @@ public abstract class RTransformProcessor extends TransformProcessor {
 		// outputString = "c(" + outputString + ")";
 		outputString = new StringBuilder("c(").append(outputString).append(")")
 				.toString();
-
 		try {
 			// Parse the expression
 			outputs = re.parse(outputString, false);
+			//log.info(re.parseAndEval("getwd()", env, true).asString());
 			// Parse the script
 			script = re.parse(scriptString, false);
 		} catch (REngineException e) {

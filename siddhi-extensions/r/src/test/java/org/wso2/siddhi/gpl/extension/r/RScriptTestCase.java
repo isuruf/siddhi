@@ -1,21 +1,14 @@
 package org.wso2.siddhi.gpl.extension.r;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import junit.framework.Assert;
 
-import org.apache.log4j.Logger;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.core.config.SiddhiConfiguration;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.query.output.callback.QueryCallback;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.util.EventPrinter;
-import org.wso2.siddhi.gpl.extension.r.RScriptTransformProcessor;
 import org.wso2.siddhi.query.api.QueryFactory;
 import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.expression.Expression;
@@ -23,28 +16,14 @@ import org.wso2.siddhi.query.api.query.Query;
 import org.wso2.siddhi.query.api.query.output.stream.OutStream;
 
 
-public class RScriptTestCase {
-	static final Logger log = Logger.getLogger(RScriptTestCase.class);
-
+public class RScriptTestCase extends RTransformTestCase {
+	
 	private int count;
-	private boolean eventArrived;
-	private static SiddhiConfiguration siddhiConfiguration;
-	private double value1;
-	private double value2;
+	protected double value1;
+	protected double value2;
 	@Before
 	public void init() {
 		count = 0;
-		eventArrived = false;
-	}
-	@BeforeClass
-    public static void setUp() throws Exception {
-		log.info("R:runScript Tests");
-		siddhiConfiguration = new SiddhiConfiguration();
-
-		List<Class> extensions = new ArrayList<Class>(1);
-		extensions.add(RScriptTransformProcessor.class);
-		siddhiConfiguration.setSiddhiExtensions(extensions);
-        
 	}
 	
 	@Test
@@ -196,4 +175,5 @@ public class RScriptTestCase {
 		Assert.assertEquals("Value 2 returned", (65.6 + 75.6), value2, 1e-4);
 		siddhiManager.shutdown();
 	}
+
 }
