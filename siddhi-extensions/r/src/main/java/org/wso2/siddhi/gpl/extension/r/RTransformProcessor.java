@@ -1,4 +1,4 @@
-package org.wso2.cep.r;
+package org.wso2.siddhi.gpl.extension.r;
 
 import java.util.ArrayList;
 import java.util.List;
