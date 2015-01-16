@@ -4,15 +4,15 @@
     <from eventAdaptorName="jmsQueueAdaptor" eventAdaptorType="jms">
         <property name="transport.jms.Destination">Weather</property>
     </from>
-	<mapping customMapping="enable" type="xml">
+    <mapping customMapping="enable" type="xml">
         <xpathDefinition namespace="http://samples.wso2.org/" prefix="weatherdata"/>
         <property>
-            <from xpath="//weatherdata:WeatherStat/weatherdata:Time"/>
-            <to name="Time" type="long"/>
+            <from xpath="//weatherdata:WeatherStat/weatherdata:time"/>
+            <to name="time" type="long"/>
         </property>
         <property>
-            <from xpath="//weatherdata:WeatherStat/weatherdata:Temp"/>
-            <to name="Temp" type="double"/>
+            <from xpath="//weatherdata:WeatherStat/weatherdata:temp"/>
+            <to name="temp" type="double"/>
         </property>
     </mapping>
     <to streamName="WeatherStatsStream" version="1.0.0"/>

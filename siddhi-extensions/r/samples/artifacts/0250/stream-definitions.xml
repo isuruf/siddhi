@@ -26,11 +26,11 @@
   "description": "",
   "payloadData": [
     {
-      "name": "Time",
+      "name": "time",
       "type": "LONG"
     },
     {
-      "name": "Temp",
+      "name": "temp",
       "type": "DOUBLE"
     }
   ]

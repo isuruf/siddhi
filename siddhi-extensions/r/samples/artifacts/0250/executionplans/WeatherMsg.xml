@@ -8,7 +8,7 @@
   <importedStreams>
     <stream as="inStream" name="WeatherStatsStream" version="1.0.0"/>
   </importedStreams>
-  <queryExpressions><![CDATA[from inStream#transform.R:runScript("fit<-lm(Temp~Time); c <- coef(fit)[['(Intercept)']]; m<-coef(fit)[['Time']];", "10" , "m,c")
+  <queryExpressions><![CDATA[from inStream#transform.R:runScript("fit<-lm(temp~time); c <- coef(fit)[['(Intercept)']]; m<-coef(fit)[['time']];", "10" , "m,c")
 select m, c
 insert into outStream]]></queryExpressions>
   <exportedStreams>

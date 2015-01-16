@@ -39,12 +39,12 @@ public class WeatherStats {
       static{
         part1 = "<weatherdata:WeatherStatsStream xmlns:weatherdata=\"http://samples.wso2.org/\">\n" +
                              " <weatherdata:WeatherStat>\n" +
-                             " <weatherdata:Time>";
+                             " <weatherdata:time>";
                              
-        part2 = "</weatherdata:Time>\n" +
-                             " <weatherdata:Temp>";
+        part2 = "</weatherdata:time>\n" +
+                             " <weatherdata:temp>";
                              
-     	part3 = "</weatherdata:Temp>\n" +
+     	part3 = "</weatherdata:temp>\n" +
                              " </weatherdata:WeatherStat>\n" +
                              " </weatherdata:WeatherStatsStream>";
         
