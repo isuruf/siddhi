@@ -37,7 +37,7 @@ public class RSourceTestCase extends RTransformTestCase{
 		  Query query = QueryFactory.createQuery();
 	        query.from(
 	                QueryFactory.inputStream("weather").
-	                        transform("R", "runSource", Expression.value("sample.R"), Expression.value("2"), Expression.value("m,c"))
+	                        transform("R", "runSource", Expression.value("src/test/resources/sample.R"), Expression.value("2"), Expression.value("m,c"))
 	        );
 	        query.select(
 	                QueryFactory.outputSelector().

@@ -17,6 +17,7 @@ import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.event.in.InEvent;
 import org.wso2.siddhi.core.event.in.InListEvent;
 import org.wso2.siddhi.core.event.in.InStream;
+import org.wso2.siddhi.core.exception.QueryCreationException;
 import org.wso2.siddhi.core.query.processor.transform.TransformProcessor;
 import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
@@ -35,8 +36,79 @@ public abstract class RTransformProcessor extends TransformProcessor {
 	REXP script;
 	REXP env;
 
-	static REngine re;
+	REngine re;
 	static Logger log = Logger.getLogger("RTransformProcessor");
+
+	protected void initialize(String scriptString, String temp,
+			String outputString) {
+		try {
+			// Get the JRIEngine or create one
+			re = JRIEngine.createEngine();
+		} catch (REngineException e) {
+			throw new QueryCreationException("Unable to create the JRIEngine",
+					e);
+		}
+		try {
+			// Create a new R environment
+			env = re.newEnvironment(null, true);
+		} catch (REngineException e) {
+			throw new QueryCreationException(
+					"Unable to create a new session in R", e);
+		} catch (REXPMismatchException e) {
+			throw new QueryCreationException(
+					"Unable to create a new session in R", e);
+		}
+
+		try {
+			// Get the duration
+			if (temp.endsWith("s")) {
+				duration = Integer.parseInt(temp
+						.substring(0, temp.length() - 1).trim()) * 1000;
+				lastRun = System.currentTimeMillis();
+			} else if (temp.endsWith("min")) {
+				duration = Integer.parseInt(temp
+						.substring(0, temp.length() - 3).trim()) * 60 * 1000;
+				lastRun = System.currentTimeMillis();
+			} else if (temp.endsWith("h")) {
+				duration = Integer.parseInt(temp
+						.substring(0, temp.length() - 3).trim()) * 60 * 60 * 1000;
+				lastRun = System.currentTimeMillis();
+			} else {
+				eventCount = Integer.parseInt(temp);
+				time = false;
+			}
+		} catch (NumberFormatException e) {
+			throw new QueryCreationException(
+					"Unsupported value for the duration given", e);
+		}
+
+		StreamDefinition streamDef = new StreamDefinition()
+				.name("ROutputStream");
+		String[] vars = outputString.split(",");
+		for (String var : vars) {
+			streamDef = streamDef.attribute(var.trim(), Attribute.Type.DOUBLE);
+		}
+		this.outStreamDefinition = streamDef;
+		eventAttributes = inStreamDefinition.getAttributeList();
+
+		// outputString = "c(" + outputString + ")";
+		outputString = new StringBuilder("c(").append(outputString).append(")")
+				.toString();
+		try {
+			// Parse the expression
+			outputs = re.parse(outputString, false);
+		} catch (REngineException e) {
+			throw new QueryCreationException(
+					"Unable to parse the output variables: " + outputString, e);
+		}
+		try {
+			// Parse the string
+			script = re.parse(scriptString, false);
+		} catch (REngineException e) {
+			throw new QueryCreationException("Unable to parse the script: "
+					+ scriptString, e);
+		}
+	}
 
 	@Override
 	protected InStream processEvent(InEvent inEvent) {
@@ -85,24 +157,31 @@ public abstract class RTransformProcessor extends TransformProcessor {
 				re.assign(attr.getName(), eventData, env);
 			}
 			re.eval(script, env, false);
+		} catch (REXPMismatchException e) {
+			throw new QueryCreationException("Unable to evaluate the script", e);
+		} catch (REngineException e) {
+			throw new QueryCreationException("Unable to evaluate the script", e);
+		}
+
+		try {
 			REXP x = re.eval(outputs, env, true);
 
 			double[] out = x.asDoubles();
 			Object[] data = new Object[out.length];
 			for (int i = 0; i < out.length; i++) {
 				data[i] = out[i];
-				//log.info(out[i]);
+				// log.info(out[i]);
 			}
 
 			eventList.clear();
 			return new InEvent(streamId, System.currentTimeMillis(), data);
 		} catch (REXPMismatchException e) {
-			log.info(e.getMessage());
+			throw new QueryCreationException(
+					"Mismatch in returned output and expected output", e);
 		} catch (REngineException e) {
-			log.info(e.getMessage());
+			throw new QueryCreationException(
+					"Error while fetching the outputs from R", e);
 		}
-		return null;
-
 	}
 
 	@Override
@@ -124,59 +203,6 @@ public abstract class RTransformProcessor extends TransformProcessor {
 
 	@Override
 	protected void restoreState(Object[] objects) {
-	}
-
-	protected void initialize(String scriptString, String temp,
-			String outputString) {
-		try {
-			// Get the JRIEngine or create one
-			re = JRIEngine.createEngine();
-			// Create a new R environment
-			env = re.newEnvironment(null, true);
-		} catch (REngineException e) {
-			log.info(e.getMessage());
-		} catch (REXPMismatchException e) {
-			log.info(e.getMessage());
-		}
-
-		if (temp.endsWith("s")) {
-			duration = Integer.parseInt(temp.substring(0, temp.length() - 1)
-					.trim()) * 1000;
-			lastRun = System.currentTimeMillis();
-		} else if (temp.endsWith("min")) {
-			duration = Integer.parseInt(temp.substring(0, temp.length() - 3)
-					.trim()) * 60 * 1000;
-			lastRun = System.currentTimeMillis();
-		} else if (temp.endsWith("h")) {
-			duration = Integer.parseInt(temp.substring(0, temp.length() - 3)
-					.trim()) * 60 * 60 * 1000;
-			lastRun = System.currentTimeMillis();
-		} else {
-			eventCount = Integer.parseInt(temp);
-			time = false;
-		}
-
-		StreamDefinition streamDef = new StreamDefinition()
-				.name("ROutputStream");
-		String[] vars = outputString.split(",");
-		for (String var : vars) {
-			streamDef = streamDef.attribute(var.trim(), Attribute.Type.DOUBLE);
-		}
-		this.outStreamDefinition = streamDef;
-		eventAttributes = inStreamDefinition.getAttributeList();
-
-		// outputString = "c(" + outputString + ")";
-		outputString = new StringBuilder("c(").append(outputString).append(")")
-				.toString();
-		try {
-			// Parse the expression
-			outputs = re.parse(outputString, false);
-			//log.info(re.parseAndEval("getwd()", env, true).asString());
-			// Parse the script
-			script = re.parse(scriptString, false);
-		} catch (REngineException e) {
-			log.info(e.getMessage());
-		}
 	}
 
 	@Override
