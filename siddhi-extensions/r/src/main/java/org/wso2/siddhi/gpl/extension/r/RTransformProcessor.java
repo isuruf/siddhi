@@ -8,10 +8,10 @@ import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPDouble;
 import org.rosuda.REngine.REXPInteger;
 import org.rosuda.REngine.REXPLogical;
-import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REXPString;
 import org.rosuda.REngine.REngine;
 import org.rosuda.REngine.REngineException;
+import org.rosuda.REngine.RList;
 import org.rosuda.REngine.JRI.JRIEngine;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.event.in.InEvent;
@@ -20,16 +20,17 @@ import org.wso2.siddhi.core.event.in.InStream;
 import org.wso2.siddhi.core.exception.QueryCreationException;
 import org.wso2.siddhi.core.query.processor.transform.TransformProcessor;
 import org.wso2.siddhi.query.api.definition.Attribute;
-import org.wso2.siddhi.query.api.definition.StreamDefinition;
+import org.wso2.siddhi.query.compiler.SiddhiCompiler;
+import org.wso2.siddhi.query.compiler.exception.SiddhiParserException;
 
 public abstract class RTransformProcessor extends TransformProcessor {
 
-	boolean time = true;
-	int eventCount;
+	boolean isTime = true;
 	long lastRun;
-	long duration;
+	long period;
 
 	List<Attribute> eventAttributes;
+	List<Attribute> outputAttributes;
 	List<InEvent> eventList = new ArrayList<InEvent>();
 
 	REXP outputs;
@@ -39,87 +40,72 @@ public abstract class RTransformProcessor extends TransformProcessor {
 	REngine re;
 	static Logger log = Logger.getLogger("RTransformProcessor");
 
-	protected void initialize(String scriptString, String temp,
-			String outputString) {
+	protected void initialize(String scriptString, String period, String outputString) {
 		try {
 			// Get the JRIEngine or create one
 			re = JRIEngine.createEngine();
-		} catch (REngineException e) {
-			throw new QueryCreationException("Unable to create the JRIEngine",
-					e);
-		}
-		try {
 			// Create a new R environment
 			env = re.newEnvironment(null, true);
-		} catch (REngineException e) {
-			throw new QueryCreationException(
-					"Unable to create a new session in R", e);
-		} catch (REXPMismatchException e) {
-			throw new QueryCreationException(
-					"Unable to create a new session in R", e);
+		} catch (Exception e) {
+			throw new QueryCreationException("Unable to create a new session in R", e);
 		}
 
 		try {
-			// Get the duration
-			if (temp.endsWith("s")) {
-				duration = Integer.parseInt(temp
-						.substring(0, temp.length() - 1).trim()) * 1000;
-				lastRun = System.currentTimeMillis();
-			} else if (temp.endsWith("min")) {
-				duration = Integer.parseInt(temp
-						.substring(0, temp.length() - 3).trim()) * 60 * 1000;
-				lastRun = System.currentTimeMillis();
-			} else if (temp.endsWith("h")) {
-				duration = Integer.parseInt(temp
-						.substring(0, temp.length() - 3).trim()) * 60 * 60 * 1000;
-				lastRun = System.currentTimeMillis();
+			if (period.endsWith("s")) {
+				this.period = Integer.parseInt(period.substring(0, period.length() - 1).trim()) * 1000;
+			} else if (period.endsWith("min")) {
+				this.period = Integer.parseInt(period.substring(0, period.length() - 3).trim()) * 60 * 1000;
+			} else if (period.endsWith("h")) {
+				this.period = Integer.parseInt(period.substring(0, period.length() - 3).trim()) * 60 * 60 * 1000;
 			} else {
-				eventCount = Integer.parseInt(temp);
-				time = false;
+				this.period = Integer.parseInt(period);
+				isTime = false;
 			}
+			lastRun = System.currentTimeMillis();
+			this.outStreamDefinition = SiddhiCompiler.parseStreamDefinition("define stream ROutputStream(" +
+			                                                 outputString + ")");
+
 		} catch (NumberFormatException e) {
-			throw new QueryCreationException(
-					"Unsupported value for the duration given", e);
+			throw new QueryCreationException("Unsupported value for the period given " + period, e);
+		} catch (SiddhiParserException e) {
+			throw new QueryCreationException("Could not parse the output variables string. Usage: \"a string, b int\"" 
+			                                 + ". Found: \""+outputString+"\"",
+			                                 e);
 		}
 
-		StreamDefinition streamDef = new StreamDefinition()
-				.name("ROutputStream");
-		String[] vars = outputString.split(",");
-		for (String var : vars) {
-			streamDef = streamDef.attribute(var.trim(), Attribute.Type.DOUBLE);
-		}
-		this.outStreamDefinition = streamDef;
 		eventAttributes = inStreamDefinition.getAttributeList();
+		outputAttributes = outStreamDefinition.getAttributeList();
 
-		// outputString = "c(" + outputString + ")";
-		outputString = new StringBuilder("c(").append(outputString).append(")")
-				.toString();
-		try {
-			// Parse the expression
-			outputs = re.parse(outputString, false);
-		} catch (REngineException e) {
-			throw new QueryCreationException(
-					"Unable to parse the output variables: " + outputString, e);
+		StringBuilder sb = new StringBuilder("list(");
+		for (int i = 0; i < outputAttributes.size(); i++) {
+			sb.append(outputAttributes.get(i).getName());
+			if (i != outputAttributes.size() - 1) {
+				sb.append(",");
+			}
 		}
+		sb.append(")");
+
 		try {
-			// Parse the string
+			// Parse the output list expression
+			outputs = re.parse(sb.toString(), false);
+			// Parse the script
 			script = re.parse(scriptString, false);
 		} catch (REngineException e) {
-			throw new QueryCreationException("Unable to parse the script: "
-					+ scriptString, e);
+			throw new QueryCreationException("Unable to parse the script: " + scriptString, e);
 		}
+		lastRun = System.currentTimeMillis();
 	}
 
 	@Override
 	protected InStream processEvent(InEvent inEvent) {
 		eventList.add(inEvent);
-		if (time) {
-			if (System.currentTimeMillis() >= lastRun + duration) {
+		if (isTime) {
+			if (System.currentTimeMillis() >= lastRun + period) {
 				lastRun = System.currentTimeMillis();
 				return runScript(inEvent.getStreamId());
 			}
 		} else {
-			if (eventList.size() == eventCount) {
+			if (eventList.size() == period) {
 				return runScript(inEvent.getStreamId());
 			}
 		}
@@ -133,54 +119,79 @@ public abstract class RTransformProcessor extends TransformProcessor {
 			for (int j = 0; j < eventAttributes.size(); j++) {
 				attr = eventAttributes.get(j);
 				switch (attr.getType()) {
-				case DOUBLE:
-					eventData = doubleToREXP(eventList, j);
-					break;
-				case FLOAT:
-					eventData = floatToREXP(eventList, j);
-					break;
-				case INT:
-					eventData = intToREXP(eventList, j);
-					break;
-				case STRING:
-					eventData = stringToREXP(eventList, j);
-					break;
-				case LONG:
-					eventData = longToREXP(eventList, j);
-					break;
-				case BOOL:
-					eventData = boolToREXP(eventList, j);
-					break;
-				default:
-					continue;
+					case DOUBLE:
+						eventData = doubleToREXP(eventList, j);
+						break;
+					case FLOAT:
+						eventData = floatToREXP(eventList, j);
+						break;
+					case INT:
+						eventData = intToREXP(eventList, j);
+						break;
+					case STRING:
+						eventData = stringToREXP(eventList, j);
+						break;
+					case LONG:
+						eventData = longToREXP(eventList, j);
+						break;
+					case BOOL:
+						eventData = boolToREXP(eventList, j);
+						break;
+					default:
+						continue;
 				}
 				re.assign(attr.getName(), eventData, env);
 			}
 			re.eval(script, env, false);
-		} catch (REXPMismatchException e) {
-			throw new QueryCreationException("Unable to evaluate the script", e);
-		} catch (REngineException e) {
+		} catch (Exception e) {
 			throw new QueryCreationException("Unable to evaluate the script", e);
 		}
 
 		try {
-			REXP x = re.eval(outputs, env, true);
-
-			double[] out = x.asDoubles();
-			Object[] data = new Object[out.length];
-			for (int i = 0; i < out.length; i++) {
-				data[i] = out[i];
-				// log.info(out[i]);
+			RList out = re.eval(outputs, env, true).asList();
+			REXP result;
+			Object[] data = new Object[out.size()];
+			for (int i = 0; i < out.size(); i++) {
+				result = ((REXP) out.get(i));
+				switch (outputAttributes.get(i).getType()) {
+					case BOOL:
+						if(result.isLogical()) {
+							data[i] = (result.asInteger() == 1);
+						}
+						break;
+					case INT:
+						if(result.isNumeric()) {
+							data[i] = result.asInteger();
+						}
+						break;
+					case LONG:
+						if(result.isNumeric()) {
+							data[i] = (long) result.asDouble();
+						}
+						break;
+					case FLOAT:
+						if(result.isNumeric()) {
+							data[i] = ((Double) result.asDouble()).floatValue();
+						}
+						break;
+					case DOUBLE:
+						if(result.isNumeric()) {
+							data[i] = result.asDouble();
+						}
+						break;
+					case STRING:
+						if(result.isString()) {
+							data[i] = result.asString();
+						}
+						break;
+					default:
+						break;
+				}
 			}
-
 			eventList.clear();
 			return new InEvent(streamId, System.currentTimeMillis(), data);
-		} catch (REXPMismatchException e) {
-			throw new QueryCreationException(
-					"Mismatch in returned output and expected output", e);
-		} catch (REngineException e) {
-			throw new QueryCreationException(
-					"Error while fetching the outputs from R", e);
+		} catch (Exception e) {
+			throw new QueryCreationException("Mismatch in returned output and expected output", e);
 		}
 	}
 
@@ -189,8 +200,10 @@ public abstract class RTransformProcessor extends TransformProcessor {
 		InListEvent transformedListEvent = new InListEvent();
 		for (Event event : inListEvent.getEvents()) {
 			if (event instanceof InEvent) {
-				transformedListEvent
-						.addEvent((Event) processEvent((InEvent) event));
+				InStream inStream = processEvent((InEvent) event);
+				if (inStream != null) {
+					transformedListEvent.addEvent((Event) inStream);
+				}
 			}
 		}
 		return transformedListEvent;
@@ -198,11 +211,13 @@ public abstract class RTransformProcessor extends TransformProcessor {
 
 	@Override
 	protected Object[] currentState() {
-		return null;
+		Object[] objects = {eventList};
+		return objects;
 	}
 
 	@Override
 	protected void restoreState(Object[] objects) {
+		eventList = (List<InEvent>) objects[0];
 	}
 
 	@Override
@@ -235,11 +250,11 @@ public abstract class RTransformProcessor extends TransformProcessor {
 	}
 
 	private REXP longToREXP(List<InEvent> list, int index) {
-		int[] arr = new int[list.size()];
+		double[] arr = new double[list.size()];
 		for (int i = 0; i < list.size(); i++) {
-			arr[i] = ((Long) list.get(i).getData(index)).intValue();
+			arr[i] = ((Long) list.get(i).getData(index)).doubleValue();
 		}
-		return new REXPInteger(arr);
+		return new REXPDouble(arr);
 	}
 
 	private REXP stringToREXP(List<InEvent> list, int index) {
@@ -257,5 +272,4 @@ public abstract class RTransformProcessor extends TransformProcessor {
 		}
 		return new REXPLogical(arr);
 	}
-
 }

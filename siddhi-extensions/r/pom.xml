@@ -72,7 +72,7 @@
 						<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
 						<Bundle-Name>${project.artifactId}</Bundle-Name>
 						<Export-Package>
-							org.wso2.siddhi.gpl.extension.geo.*
+							org.wso2.siddhi.gpl.extension.r.*
 						</Export-Package>
 						<Import-Package>
 							*;resolution:=optional

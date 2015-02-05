@@ -16,52 +16,48 @@ import org.wso2.siddhi.query.api.extension.annotation.SiddhiExtension;
 @SiddhiExtension(namespace = "R", function = "runSource")
 public class RSourceTransformProcessor extends RTransformProcessor {
 	@Override
-	protected void init(Expression[] expressions,
-			List<ExpressionExecutor> expressionExecutors,
-			StreamDefinition inStreamDefinition,
-			StreamDefinition outStreamDefinition, String elementId,
-			SiddhiContext siddhiContext) {
+	protected void init(Expression[] expressions, List<ExpressionExecutor> expressionExecutors,
+	                    StreamDefinition inStreamDefinition, StreamDefinition outStreamDefinition,
+	                    String elementId, SiddhiContext siddhiContext) {
 
 		if (expressions.length != 3) {
-			throw new QueryCreationException(
-					"Wrong number attributes given. Expected 3, found "
-							+ expressions.length);
+			throw new QueryCreationException("Wrong number attributes given. Expected 3, found " +
+			                                 expressions.length);
 		}
+		String filePath;
 		String scriptString;
-		String time;
+		String period;
 		String outputString;
 
 		try {
-			scriptString = ((StringConstant) expressions[0]).getValue();
+			filePath = ((StringConstant) expressions[0]).getValue();
 		} catch (ClassCastException e) {
-			throw new QueryCreationException(
-					"First parameter should be of type string", e);
+			throw new QueryCreationException("First parameter should be of type string. Found " +
+			                                 (expressions[0]).getClass().getCanonicalName() + "\n" +
+			                                 "Usage: runScript(script:string, period:string, outputVariables:string)");
 		}
-
 		try {
-			time = ((StringConstant) expressions[1]).getValue().trim();
+			period = ((StringConstant) expressions[1]).getValue();
 		} catch (ClassCastException e) {
-			throw new QueryCreationException(
-					"Second parameter should be of type string", e);
+			throw new QueryCreationException("Second parameter should be of type string. Found " +
+			                                 (expressions[1]).getClass().getCanonicalName() + "\n" +
+			                                 "Usage: runScript(script:string, period:string, outputVariables:string)");
 		}
-
 		try {
 			outputString = ((StringConstant) expressions[2]).getValue();
 		} catch (ClassCastException e) {
-			throw new QueryCreationException(
-					"Third parameter should be of type string", e);
+			throw new QueryCreationException("Third parameter should be of type string. Found " +
+			                                 (expressions[2]).getClass().getCanonicalName() + "\n" +
+			                                 "Usage: runScript(script:string, period:string, outputVariables:string)");
 		}
 
 		try {
-			scriptString = new String(Files.readAllBytes(Paths
-					.get(scriptString)));
+			scriptString = new String(Files.readAllBytes(Paths.get(filePath)));
 		} catch (IOException e) {
-			throw new QueryCreationException(
-					"Error while reading R source file", e);
-		} catch (SecurityException e){
-			throw new QueryCreationException(
-					"Access denied while reading R source file", e);
+			throw new QueryCreationException("Error while reading R source file", e);
+		} catch (SecurityException e) {
+			throw new QueryCreationException("Access denied while reading R source file", e);
 		}
-		initialize(scriptString, time, outputString);
+		initialize(scriptString, period, outputString);
 	}
 }

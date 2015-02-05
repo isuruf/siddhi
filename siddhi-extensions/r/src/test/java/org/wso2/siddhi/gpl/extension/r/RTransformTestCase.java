@@ -15,10 +15,9 @@ public class RTransformTestCase {
 
 	@BeforeClass
     public static void setUp() throws Exception {
-		log.info("R:runSource Tests");
 		siddhiConfiguration = new SiddhiConfiguration();
 
-		List<Class> extensions = new ArrayList<Class>(1);
+		List<Class> extensions = new ArrayList<Class>(2);
 		extensions.add(RSourceTransformProcessor.class);
 		extensions.add(RScriptTransformProcessor.class);
 		siddhiConfiguration.setSiddhiExtensions(extensions);
