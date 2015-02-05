@@ -38,7 +38,7 @@ public abstract class RTransformProcessor extends TransformProcessor {
 	REXP env;
 
 	REngine re;
-	static Logger log = Logger.getLogger("RTransformProcessor");
+	static Logger log = Logger.getLogger(RTransformProcessor.class);
 
 	protected void initialize(String scriptString, String period, String outputString) {
 		try {
@@ -56,21 +56,20 @@ public abstract class RTransformProcessor extends TransformProcessor {
 			} else if (period.endsWith("min")) {
 				this.period = Integer.parseInt(period.substring(0, period.length() - 3).trim()) * 60 * 1000;
 			} else if (period.endsWith("h")) {
-				this.period = Integer.parseInt(period.substring(0, period.length() - 3).trim()) * 60 * 60 * 1000;
+				this.period = Integer.parseInt(period.substring(0, period.length() - 1).trim()) * 60 * 60 * 1000;
 			} else {
 				this.period = Integer.parseInt(period);
 				isTime = false;
 			}
 			lastRun = System.currentTimeMillis();
 			this.outStreamDefinition = SiddhiCompiler.parseStreamDefinition("define stream ROutputStream(" +
-			                                                 outputString + ")");
+			                                                                outputString + ")");
 
 		} catch (NumberFormatException e) {
 			throw new QueryCreationException("Unsupported value for the period given " + period, e);
 		} catch (SiddhiParserException e) {
-			throw new QueryCreationException("Could not parse the output variables string. Usage: \"a string, b int\"" 
-			                                 + ". Found: \""+outputString+"\"",
-			                                 e);
+			throw new QueryCreationException("Could not parse the output variables string. Usage: \"a string, b int\"" +
+			                                         ". Found: \"" + outputString + "\"", e);
 		}
 
 		eventAttributes = inStreamDefinition.getAttributeList();
@@ -155,37 +154,39 @@ public abstract class RTransformProcessor extends TransformProcessor {
 				result = ((REXP) out.get(i));
 				switch (outputAttributes.get(i).getType()) {
 					case BOOL:
-						if(result.isLogical()) {
+						if (result.isLogical()) {
 							data[i] = (result.asInteger() == 1);
+							break;
 						}
-						break;
 					case INT:
-						if(result.isNumeric()) {
+						if (result.isNumeric()) {
 							data[i] = result.asInteger();
+							break;
 						}
-						break;
 					case LONG:
-						if(result.isNumeric()) {
+						if (result.isNumeric()) {
 							data[i] = (long) result.asDouble();
+							break;
 						}
-						break;
 					case FLOAT:
-						if(result.isNumeric()) {
+						if (result.isNumeric()) {
 							data[i] = ((Double) result.asDouble()).floatValue();
+							break;
 						}
-						break;
 					case DOUBLE:
-						if(result.isNumeric()) {
+						if (result.isNumeric()) {
 							data[i] = result.asDouble();
+							break;
 						}
-						break;
 					case STRING:
-						if(result.isString()) {
+						if (result.isString()) {
 							data[i] = result.asString();
+							break;
 						}
-						break;
 					default:
-						break;
+						throw new QueryCreationException("Mismatch in returned and expected output. Expected: " +
+						                                         outputAttributes.get(i).getType() + " Returned: " + 
+						                                         result.asNativeJavaObject().getClass().getCanonicalName());
 				}
 			}
 			eventList.clear();
@@ -211,7 +212,7 @@ public abstract class RTransformProcessor extends TransformProcessor {
 
 	@Override
 	protected Object[] currentState() {
-		Object[] objects = {eventList};
+		Object[] objects = { eventList };
 		return objects;
 	}
 
