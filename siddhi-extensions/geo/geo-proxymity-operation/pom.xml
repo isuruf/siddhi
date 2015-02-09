@@ -14,7 +14,7 @@
     <url>http://wso2.org</url>
 
     <properties>
-        <geotools.version>12-SNAPSHOT</geotools.version>
+        <geotools.version>12-RC1</geotools.version>
     </properties>
 
     <repositories>

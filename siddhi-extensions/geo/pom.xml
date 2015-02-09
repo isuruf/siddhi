@@ -16,6 +16,14 @@
     <name>Siddhi Extension - Geo fencing</name>
     <description>This is a Siddhi extension that enable Geo fencing capability</description>
     <url>http://wso2.org</url>
+    <modules>
+        <module>geo-event-fuser</module>
+        <module>geo-event-notifier</module>
+        <module>geo-event-id-generator</module>
+        <module>geo-proxymity-operation</module>
+        <module>geo-within-operation</module>
+        <module>geo-withinbuffer</module>
+    </modules>
 
     <dependencies>
         <dependency>

@@ -45,7 +45,7 @@ public class FuseEventsTestCase {
         String queryReference3 = siddhiManager.addQuery(eventSubscribeExecutionPlan);
 
 
-        String eventFuseExecutionPlan = "from dataOut#window.geo:eventsFunion(eventId) \n" +
+        String eventFuseExecutionPlan = "from dataOut#window.geo:eventsFunion(eventId, state, information) \n" +
                 "select id, latitude, longitude, timeStamp, speed, heading, state , information, 'Testing' as notify\n" +
                 "insert into dataFusedOut;";
         String eventFuseQueryReference = siddhiManager.addQuery(eventFuseExecutionPlan);

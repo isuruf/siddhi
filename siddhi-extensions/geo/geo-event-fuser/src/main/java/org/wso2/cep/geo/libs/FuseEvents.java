@@ -34,8 +34,9 @@ import java.util.*;
 @SiddhiExtension(namespace = "geo", function = "eventsFunion")
 public class FuseEvents extends WindowProcessor {
 
-    String variable = "";
-    int variablePosition = 0;
+    int eventIdPosition = 0;
+    int statePosition = 0;
+    int informationPosition = 0;
     HashMap<String, ArrayList<InEvent>> eventsBuffer = null;
 
     @Override
@@ -106,16 +107,20 @@ public class FuseEvents extends WindowProcessor {
                         AbstractDefinition abstractDefinition, String s, boolean b,
                         SiddhiContext siddhiContext) {
 
-        if (expressions.length != 1) {
-            log.error("Parameters count is not matching, There should be two parameters ");
+        if (expressions.length != 3) {
+            log.error("Parameters count is not matching, There should be three parameters ");
         }
-        variable = ((Variable) expressions[0]).getAttributeName();
         eventsBuffer = new HashMap<String, ArrayList<InEvent>>();
-        variablePosition = abstractDefinition.getAttributePosition(variable);
+        eventIdPosition = abstractDefinition.getAttributePosition(
+                ((Variable) expressions[0]).getAttributeName());
+        statePosition = abstractDefinition.getAttributePosition(
+                ((Variable) expressions[1]).getAttributeName());
+        informationPosition = abstractDefinition.getAttributePosition(
+                ((Variable) expressions[2]).getAttributeName());
     }
 
     private void doProcessing(InEvent event) {
-        String eventId = (String) event.getData(variablePosition);
+        String eventId = (String) event.getData(eventIdPosition);
 
         if (eventsBuffer.containsKey(eventId)) {
             eventsBuffer.get(eventId).add(event);
@@ -168,7 +173,7 @@ public class FuseEvents extends WindowProcessor {
         String finalState = "";
         String information = "";
 
-        String eventId = (String) event.getData(variablePosition);
+        String eventId = (String) event.getData(eventIdPosition);
         ArrayList<InEvent> receivedEvents = eventsBuffer.get(eventId);
 
         String alertStrings = "";
@@ -177,7 +182,7 @@ public class FuseEvents extends WindowProcessor {
         Integer currentStateIndex = -1;
 
         for (InEvent receivedEvent : receivedEvents) {
-            String thisState = (String) receivedEvent.getData(7);
+            String thisState = (String) receivedEvent.getData(statePosition);
             Integer thisStateIndex = states.indexOf(thisState);
 
             if (thisStateIndex > currentStateIndex) { // TODO: `this` and `current` little bit confusing??
@@ -186,9 +191,9 @@ public class FuseEvents extends WindowProcessor {
             }
 
             if (thisState.equals("ALERTED")) {
-                alertStrings += "," + (String) receivedEvent.getData(8);
+                alertStrings += "," + (String) receivedEvent.getData(informationPosition);
             } else if (thisState.equals("WARNING")) {
-                warningStrings += "," + (String) receivedEvent.getData(8);
+                warningStrings += "," + (String) receivedEvent.getData(informationPosition);
             }
         }
 
@@ -203,17 +208,10 @@ public class FuseEvents extends WindowProcessor {
             }
         }
 
-        Object[] dataOut = new Object[]{
-                data[0], // id
-                Double.parseDouble(data[1].toString()), // Latitude
-                Double.parseDouble(data[2].toString()), // Longitude
-                data[3].toString(), // TimeStamp
-                Float.parseFloat(data[4].toString()), // Speed
-                Float.parseFloat(data[5].toString()), // Heading
-                eventId,
-                finalState,
-                information
-        };
+
+        Object[] dataOut = data.clone();
+        dataOut[informationPosition] = information;
+        dataOut[statePosition] = finalState;
 
         return new InEvent(event.getStreamId(), System.currentTimeMillis(), dataOut);
     }
