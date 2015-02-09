@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>geo</artifactId>
+    <artifactId>pom</artifactId>
 
     <packaging>bundle</packaging>
 
@@ -22,6 +22,7 @@
         <module>geo-event-id-generator</module>
         <module>geo-proxymity-operation</module>
         <module>geo-within-operation</module>
+        <module>geo-intersects-operation</module>
         <module>geo-withinbuffer</module>
     </modules>
 
