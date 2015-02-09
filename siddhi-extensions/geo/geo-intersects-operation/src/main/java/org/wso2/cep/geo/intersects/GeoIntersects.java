@@ -1,4 +1,4 @@
-package org.wso2.cep.geo;
+package org.wso2.cep.geo.intersects;
 
 import com.vividsolutions.jts.geom.*;
 import org.apache.log4j.Logger;
