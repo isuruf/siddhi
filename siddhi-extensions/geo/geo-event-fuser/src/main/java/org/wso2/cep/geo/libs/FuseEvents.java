@@ -106,17 +106,25 @@ public class FuseEvents extends WindowProcessor {
                         QueryPostProcessingElement queryPostProcessingElement,
                         AbstractDefinition abstractDefinition, String s, boolean b,
                         SiddhiContext siddhiContext) {
-
-        if (expressions.length != 3) {
-            log.error("Parameters count is not matching, There should be three parameters ");
-        }
         eventsBuffer = new HashMap<String, ArrayList<InEvent>>();
-        eventIdPosition = abstractDefinition.getAttributePosition(
-                ((Variable) expressions[0]).getAttributeName());
-        statePosition = abstractDefinition.getAttributePosition(
-                ((Variable) expressions[1]).getAttributeName());
-        informationPosition = abstractDefinition.getAttributePosition(
-                ((Variable) expressions[2]).getAttributeName());
+        if (expressions.length == 1) {
+            eventIdPosition = abstractDefinition.getAttributePosition(
+                    ((Variable) expressions[0]).getAttributeName());
+            statePosition = 7;
+            informationPosition = 8;
+            log.info("This method is deprecated. Taking default values of state and information attributes as 7 and 8." +
+                    " Use geo:eventsFunion(id, state, information) to give the state and information attributes.");
+        } else if (expressions.length == 3) {
+            eventIdPosition = abstractDefinition.getAttributePosition(
+                    ((Variable) expressions[0]).getAttributeName());
+            statePosition = abstractDefinition.getAttributePosition(
+                    ((Variable) expressions[1]).getAttributeName());
+            informationPosition = abstractDefinition.getAttributePosition(
+                    ((Variable) expressions[2]).getAttributeName());
+        } else {
+            log.error("Parameters count is not matching, there should be three parameters ");
+        }
+
     }
 
     private void doProcessing(InEvent event) {
