@@ -32,6 +32,7 @@ public class NotifyAlert extends FunctionExecutor {
     //    Logger log = Logger.getLogger(CustomFunctionExtension.class);
     Attribute.Type returnType;
     String previousInformation;
+    Boolean sendFirst = false;
     HashMap<String, String> informationBuffer = new HashMap<String, String>();
 
     /**
@@ -48,6 +49,13 @@ public class NotifyAlert extends FunctionExecutor {
             }
         }
         returnType = Attribute.Type.BOOL;
+        if (types.length == 3) {
+            String options = (String) attributeExpressionExecutors.get(2)
+                    .execute(null);
+            if(options.contains("sendFirst")) {
+                sendFirst = true;
+            }
+        }
     }
 
     /**
@@ -62,7 +70,9 @@ public class NotifyAlert extends FunctionExecutor {
         Object[] objects = (Object[]) obj;
         String id = (String) objects[0];
         String currentInformation = (String) objects[1];
-        if (informationBuffer.containsKey(id) && !informationBuffer.get(id).equals(currentInformation)) {
+        if (!informationBuffer.containsKey(id)) {
+            returnValue = sendFirst;
+        } else if (!informationBuffer.get(id).equals(currentInformation)) {
             returnValue = true;
         }
         informationBuffer.put(id, currentInformation);
