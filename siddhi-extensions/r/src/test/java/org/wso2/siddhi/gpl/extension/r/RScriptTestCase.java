@@ -81,7 +81,7 @@ public class RScriptTestCase extends RTransformTestCase {
 		siddhiManager.defineStream(QueryFactory.createStreamDefinition().name("weather")
 		                                       .attribute("time", Attribute.Type.INT)
 		                                       .attribute("temp", Attribute.Type.DOUBLE));
-		String script = "\" " + "c <- \"asd\"; m <- sum(temp) ;\"";
+		String script = "\" " + "c <- sum(time); m <- sum(temp) ;\"";
 		String query = "from weather#transform.R:runScript(" + script +
 		                       ", \"2s\", \"c int, m double\") " + "select * " +
 		                       "insert into weatherOutput";
@@ -102,14 +102,14 @@ public class RScriptTestCase extends RTransformTestCase {
 			}
 		});
 
-		InputHandler inputHandler = siddhiManager.getInputHandler("weather");
+			InputHandler inputHandler = siddhiManager.getInputHandler("weather");
 		inputHandler.send(new Object[] { 10, 55.6 });
 		inputHandler.send(new Object[] { 20, 65.6 });
 		Thread.sleep(2500);
 		inputHandler.send(new Object[] { 30, 75.6 });
 		Thread.sleep(1000);
 		Assert.assertEquals("Only one event must arrive", 1, count);
-		Assert.assertEquals("Value 1 returned", 0, intValue1);
+		Assert.assertEquals("Value 1 returned", 60, intValue1);
 		Assert.assertEquals("Value 2 returned", (55.6 + 65.6 + 75.6), doubleValue1, 1e-4);
 		siddhiManager.shutdown();
 	}
