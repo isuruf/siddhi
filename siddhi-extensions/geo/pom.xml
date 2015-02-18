@@ -9,14 +9,16 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>pom</artifactId>
+    <groupId>org.wso2.siddhi.gpl.extensions</groupId>
+    <artifactId>geo</artifactId>
 
-    <packaging>bundle</packaging>
+    <packaging>pom</packaging>
 
     <name>Siddhi Extension - Geo fencing</name>
     <description>This is a Siddhi extension that enable Geo fencing capability</description>
     <url>http://wso2.org</url>
     <modules>
+        <module>geo-libs</module>
         <module>geo-event-fuser</module>
         <module>geo-event-notifier</module>
         <module>geo-event-id-generator</module>
@@ -49,29 +51,32 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <version>2.3.7</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Bundle-Name>${project.artifactId}</Bundle-Name>
-                        <Export-Package>
-                            org.wso2.siddhi.gpl.extension.geo.*
-                        </Export-Package>
-                        <Import-Package>
-                            *;resolution:=optional
-                        </Import-Package>
-                        <DynamicImport-Package>*</DynamicImport-Package>
-                    </instructions>
-                </configuration>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-artifact</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>${project.artifactId}</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>${project.packaging}</type>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>../target/</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
-
 </project>

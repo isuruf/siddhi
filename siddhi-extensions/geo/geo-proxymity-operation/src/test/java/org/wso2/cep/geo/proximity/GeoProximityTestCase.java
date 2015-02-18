@@ -1,5 +1,6 @@
 package org.wso2.cep.geo.proximity;
 
+import org.junit.Test;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.config.SiddhiConfiguration;
 import org.wso2.siddhi.core.event.Event;
@@ -12,7 +13,8 @@ import java.util.List;
 
 
 public class GeoProximityTestCase {
-    public static void main(String[] args) throws Exception {
+    @Test
+    public void testProximity() {
 
         //from anurudhdha
         SiddhiConfiguration conf = new SiddhiConfiguration();
@@ -58,57 +60,61 @@ public class GeoProximityTestCase {
         InputHandler inputHandler = siddhiManager
                 .getInputHandler("cseEventStream");
         //inputHandler.send(new Object[] { 1, 234.345,6.844997820293952,79.94248329162588,98.34});
-        inputHandler.send(new Object[]{1, 234.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{2, 244.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{3, 244.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{1, 254.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{2, 254.345, 5, 100});
-        inputHandler.send(new Object[]{3, 254.345, 5, 100});
-        inputHandler.send(new Object[]{1, 264.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{4, 244.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{5, 254.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{4, 254.345, 5, 100});
-        inputHandler.send(new Object[]{4, 254.345, 5, 100});
-        inputHandler.send(new Object[]{1, 264.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{2, 274.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{1, 284.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{5, 264.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{5, 274.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{5, 284.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{2, 284.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{5, 294.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{5, 234.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{2, 244.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{3, 244.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{1, 254.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{5, 254.345, 5, 100});
-        inputHandler.send(new Object[]{3, 254.345, 5, 100});
-        inputHandler.send(new Object[]{1, 264.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{2, 274.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{1, 284.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{3, 264.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{3, 274.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{3, 284.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{2, 284.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{1, 294.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{1, 234.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{2, 244.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{3, 244.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{1, 254.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{2, 254.345, 5, 100});
-        inputHandler.send(new Object[]{3, 254.345, 5, 100});
-        inputHandler.send(new Object[]{1, 264.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{2, 274.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{1, 284.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{3, 264.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{3, 274.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{3, 284.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{2, 284.345, 100.786, 6.9876});
-        inputHandler.send(new Object[]{1, 294.345, 100.786, 6.9876});
+        try {
+            inputHandler.send(new Object[]{1, 234.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{2, 244.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{3, 244.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{1, 254.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{2, 254.345, 5, 100});
+            inputHandler.send(new Object[]{3, 254.345, 5, 100});
+            inputHandler.send(new Object[]{1, 264.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{4, 244.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{5, 254.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{4, 254.345, 5, 100});
+            inputHandler.send(new Object[]{4, 254.345, 5, 100});
+            inputHandler.send(new Object[]{1, 264.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{2, 274.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{1, 284.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{5, 264.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{5, 274.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{5, 284.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{2, 284.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{5, 294.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{5, 234.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{2, 244.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{3, 244.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{1, 254.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{5, 254.345, 5, 100});
+            inputHandler.send(new Object[]{3, 254.345, 5, 100});
+            inputHandler.send(new Object[]{1, 264.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{2, 274.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{1, 284.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{3, 264.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{3, 274.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{3, 284.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{2, 284.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{1, 294.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{1, 234.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{2, 244.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{3, 244.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{1, 254.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{2, 254.345, 5, 100});
+            inputHandler.send(new Object[]{3, 254.345, 5, 100});
+            inputHandler.send(new Object[]{1, 264.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{2, 274.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{1, 284.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{3, 264.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{3, 274.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{3, 284.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{2, 284.345, 100.786, 6.9876});
+            inputHandler.send(new Object[]{1, 294.345, 100.786, 6.9876});
 
 
-        //inputHandler.send(new Object[] { "100.5", "100.5" });
-        Thread.sleep(100);
+            //inputHandler.send(new Object[] { "100.5", "100.5" });
+            Thread.sleep(100);
+        } catch (InterruptedException e){
+
+        }
         // Assert.assertEquals(3, count);
         // Assert.assertEquals("Event arrived", true, eventArrived);
         siddhiManager.shutdown();
