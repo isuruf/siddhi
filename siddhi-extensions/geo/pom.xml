@@ -25,7 +25,7 @@
         <module>geo-proxymity-operation</module>
         <module>geo-within-operation</module>
         <module>geo-intersects-operation</module>
-        <module>geo-withinbuffer</module>
+        <module>geo-stationery</module>
     </modules>
 
     <dependencies>
