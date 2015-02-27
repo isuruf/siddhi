@@ -18,38 +18,38 @@ package org.wso2.cep.geo.notify;
 * under the License.
 */
 
-import org.wso2.siddhi.core.config.SiddhiContext;
-import org.wso2.siddhi.core.exception.QueryCreationException;
+import org.wso2.siddhi.core.config.ExecutionPlanContext;
+import org.wso2.siddhi.core.exception.ExecutionPlanCreationException;
+import org.wso2.siddhi.core.exception.OperationNotSupportedException;
+import org.wso2.siddhi.core.executor.ExpressionExecutor;
 import org.wso2.siddhi.core.executor.function.FunctionExecutor;
 import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.extension.annotation.SiddhiExtension;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 @SiddhiExtension(namespace = "geo", function = "needToNotify")
 public class NotifyAlert extends FunctionExecutor {
 
-    //    Logger log = Logger.getLogger(CustomFunctionExtension.class);
-    Attribute.Type returnType;
-    String previousInformation;
     Boolean sendFirst = false;
-    HashMap<String, String> informationBuffer = new HashMap<String, String>();
+    ConcurrentHashMap<String, String> informationBuffer = new ConcurrentHashMap<String, String>();
 
     /**
-     * Method will be called when initialising the custom function
+     * The initialization method for FunctionExecutor
      *
-     * @param types
-     * @param siddhiContext
+     * @param attributeExpressionExecutors are the executors of each attributes in the function
+     * @param executionPlanContext         SiddhiContext
      */
     @Override
-    public void init(Attribute.Type[] types, SiddhiContext siddhiContext) {
-        for (Attribute.Type attributeType : types) {
-            if (!(attributeType == Attribute.Type.STRING)) {
-                throw new QueryCreationException("Information should be a string value");
+    public void init(List<ExpressionExecutor> attributeExpressionExecutors, ExecutionPlanContext executionPlanContext) {
+        for (ExpressionExecutor expressionExecutor : attributeExpressionExecutors) {
+            if (!(expressionExecutor.getReturnType() == Attribute.Type.STRING)) {
+                throw new ExecutionPlanCreationException("Information should be a string value");
             }
         }
-        returnType = Attribute.Type.BOOL;
-        if (types.length == 3) {
+        if (attributeExpressionExecutors.size() == 3) {
             String options = (String) attributeExpressionExecutors.get(2)
                     .execute(null);
             if(options.contains("sendFirst")) {
@@ -59,17 +59,16 @@ public class NotifyAlert extends FunctionExecutor {
     }
 
     /**
-     * Method called when sending events to process
+     * The main executions method which will be called upon event arrival
      *
-     * @param obj
+     * @param data the runtime values of the attributeExpressionExecutors
      * @return
      */
     @Override
-    protected Object process(Object obj) {
+    protected Object execute(Object[] data) {
         Boolean returnValue = false;
-        Object[] objects = (Object[]) obj;
-        String id = (String) objects[0];
-        String currentInformation = (String) objects[1];
+        String id = (String) data[0];
+        String currentInformation = (String) data[1];
         if (!informationBuffer.containsKey(id)) {
             returnValue = sendFirst;
         } else if (!informationBuffer.get(id).equals(currentInformation)) {
@@ -80,18 +79,28 @@ public class NotifyAlert extends FunctionExecutor {
     }
 
     @Override
-    public void destroy() {
+    protected Object execute(Object data) {
+        throw new IllegalStateException("needToNotify cannot execute data " + data);
+    }
+
+    @Override
+    public void start() {
 
     }
 
-    /**
-     * Return type of the custom function mentioned
-     *
-     * @return
-     */
+    @Override
+    public void stop() {
+
+    }
+
+    @Override
+    public ExpressionExecutor cloneExecutor() {
+        return null;
+    }
+
     @Override
     public Attribute.Type getReturnType() {
-        return returnType;
+        return Attribute.Type.BOOL;
     }
 
 

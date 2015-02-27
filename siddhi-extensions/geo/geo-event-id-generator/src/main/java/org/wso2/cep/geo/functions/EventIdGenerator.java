@@ -18,76 +18,63 @@ package org.wso2.cep.geo.functions;
 * under the License.
 */
 
-import org.wso2.siddhi.core.config.SiddhiContext;
+import org.wso2.siddhi.core.config.ExecutionPlanContext;
+import org.wso2.siddhi.core.executor.ExpressionExecutor;
 import org.wso2.siddhi.core.executor.function.FunctionExecutor;
 import org.wso2.siddhi.query.api.definition.Attribute;
-import org.wso2.siddhi.query.api.extension.annotation.SiddhiExtension;
 
+import java.util.Arrays;
 import java.util.UUID;
 
-@SiddhiExtension(namespace = "geo", function = "generateEventId")
 public class EventIdGenerator extends FunctionExecutor {
-
-    //    Logger log = Logger.getLogger(CustomFunctionExtension.class);
-    Attribute.Type returnType;
-
     /**
-     * Method will be called when initialising the custom function
+     * The initialization method for FunctionExecutor, this method will be called before the other methods
      *
-     * @param types
-     * @param siddhiContext
+     * @param attributeExpressionExecutors are the executors of each function parameters
+     * @param executionPlanContext         the context of the execution plan
      */
     @Override
-    public void init(Attribute.Type[] types, SiddhiContext siddhiContext) {
+    protected void init(ExpressionExecutor[] attributeExpressionExecutors, ExecutionPlanContext executionPlanContext) {
 
-//        -For reference-
-/*        for (Attribute.Type attributeType : types) {
-            if (attributeType == Attribute.Type.DOUBLE) {
-                returnType = attributeType;
-                break;
-            } else if ((attributeType == Attribute.Type.STRING) || (attributeType == Attribute.Type.BOOL)) {
-                throw new QueryCreationException("Plus cannot have parameters with types String or Bool");
-            } else {
-                returnType = Attribute.Type.LONG;
-            }
-
-        }*/
-        returnType = Attribute.Type.STRING;
     }
 
     /**
-     * Method called when sending events to process
+     * Used to collect the serializable state of the processing element, that need to be
+     * persisted for the reconstructing the element to the same state on a different point of time
      *
-     * @param obj
+     * @return stateful objects of the processing element as an array
+     */
+    @Override
+    public Object[] currentState() {
+        return new Object[0];
+    }
+
+    /**
+     * Used to restore serialized state of the processing element, for reconstructing
+     * the element to the same state as if was on a previous point of time.
+     *
+     * @param state the stateful objects of the element as an array on
+     *              the same order provided by currentState().
+     */
+    @Override
+    public void restoreState(Object[] state) {
+
+    }
+
+    /**
+     * The main executions method which will be called upon event arrival
+     *
+     * @param data the runtime values of the attributeExpressionExecutors
      * @return
      */
     @Override
-    protected Object process(Object obj) {
-// -for reference-
-/*        if (returnType == Attribute.Type.DOUBLE) {
-            double total = 0;
-            if (obj instanceof Object[]) {
-                for (Object aObj : (Object[]) obj) {
-                    total += Double.parseDouble(String.valueOf(aObj));
-                }
-            }
-            return total;
-        } else {
-            long total = 0;
-            if (obj instanceof Object[]) {
-                for (Object aObj : (Object[]) obj) {
-                    total += Long.parseLong(String.valueOf(aObj));
-                }
-            }
-            return total;
-        }*/
-
-        return UUID.randomUUID().toString();
+    protected Object execute(Object[] data) {
+        throw new IllegalStateException("generateEventId cannot execute two data " + Arrays.deepToString(data));
     }
 
     @Override
-    public void destroy() {
-
+    protected Object execute(Object data) {
+        return UUID.randomUUID().toString();
     }
 
     /**
@@ -97,8 +84,16 @@ public class EventIdGenerator extends FunctionExecutor {
      */
     @Override
     public Attribute.Type getReturnType() {
-        return returnType;
+        return Attribute.Type.STRING;
     }
 
+    @Override
+    public void start() {
+        //Nothing to start
+    }
 
+    @Override
+    public void stop() {
+        //nothing to stop
+    }
 }

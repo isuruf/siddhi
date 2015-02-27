@@ -6,7 +6,7 @@
     <parent>
         <artifactId>geo</artifactId>
         <groupId>org.wso2.siddhi.gpl.extensions</groupId>
-        <version>2.2.0-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
     </parent>
     <groupId>org.wso2.siddhi.gpl.extensions.geo</groupId>
     <artifactId>geo-event-id-uuid-generator</artifactId>
